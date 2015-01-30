@@ -1,0 +1,5 @@
+This folder contains a set of scripts for translating an observed segmented image to an ABox represented with logical symbols. 
+
+aboxGeneration.zsh read an image as an input and then extract all the structures presented in this image. All the recognized structures are initialized as an individual in the ABox which belongs to corresponding structure concept. 
+
+Furthermore, we evaluate relationships between each pair of detected structures and update the ABox with detected relations between corresponding pairs of individuals. 

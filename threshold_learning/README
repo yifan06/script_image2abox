@@ -1,0 +1,21 @@
+A set of scripts in this folder is used to decide a threshold for quantification of spatial measurements in image. 
+
+tolearn.zsh gets all the corresponding lists of spatial structures belonging to certain relations and calls  computeRelation.zsh to evaluate a numerical satisfaction degree.
+
+computeRelation.zsh: extraction of segmented structures and computation of spatial relations with the script spatialRelation.zsh.
+
+spatialRelation.zsh: evaluation of distances and directions between two objects.
+
+function.zsh function_ima.zsh provide a set of small tools such as checking exsistence of files and conversion of images. (not all can be applied directly for service)
+
+
+
+In the real application, all pairs of structures in the database (both healthy and pathological case) are extracted and all the spatial relations are evaluated by comp_histo_angle3d.zsh using the method of histogram of angles. 
+For each relations, we separates the whole set into two parts (this part is done manully). The threshold is learned by a matlab code.
+
+All brain structures in the dataset are segemented and saved in the folder "allstructures".
+All histograms of angles between each pair of structures are saved in the folder  "histo".
+The folder "output_intersect" consists of satisfaction degrees computed by intersection of relation fuzzy set and histogram of angles.
+The folder "output_cc" consists of satisfaction degrees computed by gravity of compatiblility center.
+
+

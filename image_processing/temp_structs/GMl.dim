@@ -1,0 +1,5 @@
+256 128 256 1
+-type U8
+-dx 0.9375 -dy 1.5 -dz 0.9375 -dt 1
+-bo DCBA
+-om binar

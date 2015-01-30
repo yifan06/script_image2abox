@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<rdf:RDF
+			xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+		    xmlns="files:///data/yiyang/dataset/Ontologies/observation#"
+			xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+			xmlns:owl="http://www.w3.org/2002/07/owl#"
+		    xml:base="files:///data/yiyang/dataset/Ontologies/observation">
+<owl:NamedIndividual rdf:about="files:///data/yiyang/dataset/Ontologies/observation#eye">
+<rdf:type rdf:resource="files:///data/yiyang/dataset/Ontologies/observation#Eye"/>
+</owl:NamedIndividual>
+<owl:NamedIndividual rdf:about="files:///data/yiyang/dataset/Ontologies/observation#nose">
+<rdf:type rdf:resource="files:///data/yiyang/dataset/Ontologies/observation#Nose"/>
+</owl:NamedIndividual>
+<owl:NamedIndividual rdf:about="files:///data/yiyang/dataset/Ontologies/observation#eye">
+<below rdf:resource="files:///data/yiyang/dataset/Ontologies/observation#nose"/>
+</owl:NamedIndividual>
+</rdf:RDF> 
+		 <!-- Created with zsh script -->

@@ -1,0 +1,7 @@
+attributes = {
+    'data_type' : 'U8',
+    'file_type' : 'GIS',
+    'object_type' : 'Volume',
+    'volume_dimension' : [ 256, 128, 256, 1 ],
+    'voxel_size' : [ 0.9375, 1.5, 0.9375, 1 ]
+  }

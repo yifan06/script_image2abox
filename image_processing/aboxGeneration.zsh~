@@ -1,0 +1,84 @@
+#!/bin/zsh
+
+# Generation of an observation using an ABox from an image 
+# input image
+ 
+ENVIRONMENT="dev"
+DB_PATH="/data/db"
+ 
+usage()
+{
+    echo "if this was a real script you would see something useful here"
+    echo ""
+    echo "./simple_args_parsing.sh"
+    echo "\t-h --help"
+    echo "\t--environment=$ENVIRONMENT"
+    echo "\t--db-path=$DB_PATH"
+    echo ""
+}
+
+# get all structures presenting in image
+extractAll()
+{
+    echo "IMG is $IMG"    
+}
+# option 1 get arguments with getopts
+while getopts :i:h:hin:c: opt
+do
+	echo $opt
+	echo $OPTARG
+    case $opt in
+	i | input)
+	    echo "haha"
+	    echo $OPTARG
+	    IMG=$OPTARG;;
+	h)
+	    usage
+	    exit;;
+    esac 
+done
+
+# option 2 read arguments with shift and simple patterns
+#while [[ $1 = -* ]]; do
+#	case $1 in
+#	  -i | --input)
+#		IMG=$2
+#		;;
+#   	  -h | --help)
+#		usage
+#		exit;;
+#	esac
+#        shift
+#done
+ 
+ # awk find seperate patterns in a variable
+ #while [ "$1" = -* ]; do
+ #    PARAM=`echo $1 | awk -F= '{print $1}'`
+ #    VALUE=`echo $1 | awk -F= '{print $2}'`
+ #    case $PARAM in
+ #	-i | --input)
+ #	    IMG=$VALUE
+ #	    ;;
+ #        -h | --help)
+ #            usage
+ #            exit
+ #            ;;
+ #        --environment)
+ #            ENVIRONMENT=$VALUE
+ #            ;;
+ #        --db-path)
+ #            DB_PATH=$VALUE
+ #            ;;
+ #        *)
+ #            echo "ERROR: unknown parameter \"$PARAM\""
+ #            usage
+ #            exit 1
+ #            ;;
+ #    esac
+ #    shift
+ #done
+ 
+ 
+echo "ENVIRONMENT is $ENVIRONMENT";
+echo "DB_PATH is $DB_PATH";
+echo "IMG is $IMG";
