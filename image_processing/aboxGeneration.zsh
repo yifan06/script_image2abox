@@ -6,8 +6,10 @@
 DB_PATH="/data/yiyang/dataset/image/Brain"
 TMP_STRUCT="./temp_structs" 
 TMP_REL="./temp_relations"
+TMP_INTER="./inter_results"
 source function_ima.zsh
 source function.zsh
+typeset -A indConceptMap
 
 usage()
 {
@@ -59,6 +61,7 @@ evalRelations() {
 	 typeset -A fileVarMap
 	 typeset -A fileDuplicate
 
+	 count=0
 	 for i in $TMP_STRUCT/*.ima 
 	 do
 			 curimg="$i"
@@ -67,30 +70,35 @@ evalRelations() {
 			 concept=${fileWithExt%.*}
 			 echo $concept
 			 fileVarMap[${concept}]=$curimg
+			 indConceptMap[${concept}]=ind${count}
+			 (( count = $count + 1 ))
 	 done
 	 echo ${(k)fileVarMap}
 	 echo ${(v)fileVarMap}
 
-	 foreach key in ${(k)fileVarMap}
-	 do
-			 echo "key : $key"
-			 echo "value : ${fileVarMap[$key]}"
-	 done
-	 fileDuplicate=("${(@kv)fileVarMap}")
-	 foreach key in ${(k)fileDuplicate}
-	 do
-			 foreach key2 in ${(k)fileDuplicate}
-	 		 do
-					 [[ $key != $key2 ]] && {
-			 			echo "key : $key"
-			 			echo "key2 : $key2"
-						[[ -e $TMP_REL ]] || {mkdir $TMP_REL}
-						computeDirection ${fileDuplicate[$key]} $key ${fileDuplicate[$key2]} $key2 $TMP_REL
-						}
-			 done
-			  # delete the combined element.
-			  unset "fileDuplicate[$key]"
-	 done
+	 echo ${(k)indConceptMap}
+	 echo ${(v)indConceptMap}
+#	 foreach key in ${(k)fileVarMap}
+#	 do
+#			 echo "key : $key"
+#			 echo "value : ${fileVarMap[$key]}"
+#	 done
+#	 fileDuplicate=("${(@kv)fileVarMap}")
+#	 foreach key in ${(k)fileDuplicate}
+#	 do
+#			 foreach key2 in ${(k)fileDuplicate}
+#	 		 do
+#					 [[ $key != $key2 ]] && {
+#			 			echo "key : $key"
+#			 			echo "key2 : $key2"
+#						[[ -e $TMP_REL ]] || {mkdir $TMP_REL}
+#						computeDirection ${fileDuplicate[$key]} $key ${fileDuplicate[$key2]} $key2 $TMP_REL
+#						}
+#			 done
+#			  # delete the combined element.
+#			  unset "fileDuplicate[$key]"
+#	 done
+#	 
 	 #echo ${fileVarMap[@]}
 			 #Key=${!fileVarMap[*]}
 			 #Value=${fileVarMap[*]}
@@ -116,18 +124,54 @@ callMatlab() {
 		matlab -nodisplay -nodesktop -nojvm -r "filepath='$TMP_REL/';try eval_direction(filepath); catch; end; quit"
 }
 
-# write all concepts in list to the xml file as the ABox
+# write all concepts in list to the owl file as the ABox
 # write also evaluated spatial relations
 output_ABox() {
-	# read results from corresponding folders and creat an xml files.
+	# read results from corresponding folders and creat an owl files.
     # output abox ontology owl file named after image name.	
 	OUTABOX="${IMG}_abox.owl"
-	[[ -e $OUTABOX ]] || {
-	headOnto $OUTABOX
+	[[ -e $OUTABOX ]] && { rm $OUTABOX }
+   	
+	{	headOnto $OUTABOX
 	# parsing relation files in temporal relation folder
-	conceptIndOnto "eye" "Eye" $OUTABOX
-	conceptIndOnto "nose" "Nose" $OUTABOX
-	roleIndOnto "eye" "below" "nose" $OUTABOX
+	# get list of structures in temporal folder and creat an individual for each structures
+	
+	 foreach key in ${(k)indConceptMap}
+	 do
+			 echo "key : $key"
+			 echo "value : ${indConceptMap[$key]}"
+			 conceptIndOnto ${indConceptMap[$key]} $key $OUTABOX
+	 done
+
+	# add all detected relations to abox
+     for rel in ${TMP_INTER}/*.txt
+	 do
+			 echo ${rel}
+			 file="${rel}"
+			 fileWithExt=${file##*/}
+			 echo $fileWithExt
+			 pattern=${fileWithExt%.*}
+			 echo $pattern
+			 obj1=${pattern%_*}
+			 echo $obj1
+			 obj2=${pattern##*_}
+			 echo $obj2
+			 vr=`grep "right" ${rel} | xargs | cut -d' ' -f 2`
+			 [[ $vr > 0.5 ]] && { roleIndOnto ${indConceptMap[$obj1]} "rightOf" ${indConceptMap[$obj2]} $OUTABOX }
+			 vl=`grep "left" ${rel} | xargs | cut -d' ' -f 2`
+			 [[ $vl > 0.5 ]] && { roleIndOnto ${indConceptMap[$obj1]} "leftOf" ${indConceptMap[$obj2]} $OUTABOX }
+			 vu=`grep "up" ${rel} | xargs | cut -d' ' -f 2`
+			 [[ $vu > 0.5 ]] && { roleIndOnto ${indConceptMap[$obj1]} "above" ${indConceptMap[$obj2]} $OUTABOX }
+			 vd=`grep "down" ${rel} | xargs | cut -d' ' -f 2`
+			 [[ $vd > 0.5 ]] && { roleIndOnto ${indConceptMap[$obj1]} "below" ${indConceptMap[$obj2]} $OUTABOX }
+			 vf=`grep "front" ${rel} | xargs | cut -d' ' -f 2`
+			 [[ $vr > 0.5 ]] && { roleIndOnto ${indConceptMap[$obj1]} "inFront" ${indConceptMap[$obj2]} $OUTABOX }
+			 vb=`grep "behind" ${rel} | xargs | cut -d' ' -f 2`
+			 [[ $vb > 0.5 ]] && { roleIndOnto ${indConceptMap[$obj1]} "behind" ${indConceptMap[$obj2]} $OUTABOX }
+	 done	 
+	#conceptIndOnto "eye" "Eye" $OUTABOX
+	#conceptIndOnto "nose" "Nose" $OUTABOX
+	#roleIndOnto "eye" "below" "nose" $OUTABOX
 	footOnto $OUTABOX }
 }
 # option 1 get arguments with getopts
@@ -137,10 +181,10 @@ do
 	i | -input)
 	    echo $OPTARG
 	    IMG=$OPTARG
-	    extractAll
+	   # extractAll
 	    evalRelations
-	    callMatlab
-	   # output_ABox
+	    #callMatlab
+	    output_ABox
 	    ;;
 	h | -help)
 	    usage
@@ -170,7 +214,7 @@ echo "IMG is $IMG";
 # verify if the image given exists in the db_path
 # IMG_PATH=`find $DB_PATH -iname $IMG`
 # echo $IMG_PATH
-#t_computeVolume -i $IMG_PATH
+# t_computeVolume -i $IMG_PATH
 
 
 
